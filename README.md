@@ -12,7 +12,7 @@ El código no está publicado — estos READMEs están pensados para que cualqui
 | Proyecto | Descripción |
 |---|---|
 | [defi-stable-bot](./defi-stable-bot/README.md) | Bot de Telegram que reporta oportunidades de depósito en stablecoins en Base y Arbitrum via DeFiLlama. Incluye análisis de riesgo con IA. |
-
+| [plantilla-bot](./plantilla-bot/README.md) | Template para documentar bots de home server |
 ---
 
 ## Stack general
