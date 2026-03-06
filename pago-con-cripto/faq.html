@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FAQ – Checkout Cripto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07090f;
+      --surface: #0e1117;
+      --surface2: #151922;
+      --border: #1e2533;
+      --border-hi: #2a3347;
+      --text: #e8ecf5;
+      --text-muted: #6b7a99;
+      --text-dim: #3d4a63;
+      --green: #00d68f;
+      --green-dim: rgba(0,214,143,.07);
+      --green-border: rgba(0,214,143,.18);
+      --accent: #4f7fff;
+      --amber: #f5a623;
+      --amber-dim: rgba(245,166,35,.08);
+      --amber-border: rgba(245,166,35,.2);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: .6;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+    }
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: .72rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: .35rem .75rem;
+      border-radius: 6px;
+      transition: border-color .2s, color .2s;
+    }
+    .back-link:hover { border-color: var(--border-hi); color: var(--text); }
+    .nav-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--text-dim);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    /* HERO */
+    .hero {
+      margin-bottom: 3rem;
+    }
+    .hero .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--green);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: .8rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: 1rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--green);
+    }
+    .hero p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* SECTION TITLE */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--text-dim);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* FLUIDKEY EXPLAINER */
+    .fk-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .fk-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .fk-icon {
+      width: 44px; height: 44px;
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.3rem;
+    }
+    .fk-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .fk-header p {
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem;
+      color: var(--text-muted);
+      margin-top: .15rem;
+    }
+    .fk-body p {
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: .9rem;
+    }
+    .fk-body p:last-child { margin-bottom: 0; }
+    .fk-body strong { color: var(--text); font-weight: 600; }
+    .fk-body a { color: var(--accent); text-decoration: none; }
+    .fk-body a:hover { text-decoration: underline; }
+
+    .fk-props {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: .75rem;
+      margin-top: 1.25rem;
+    }
+    .fk-prop {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem .9rem;
+    }
+    .fk-prop .prop-icon { font-size: 1rem; margin-bottom: .35rem; }
+    .fk-prop .prop-title {
+      font-size: .78rem;
+      font-weight: 700;
+      margin-bottom: .2rem;
+    }
+    .fk-prop .prop-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* FLOW */
+    .flow {
+      margin-bottom: 2.5rem;
+    }
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .flow-step {
+      display: flex;
+      gap: 1rem;
+      position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 36px;
+      width: 1px;
+      height: calc(100% - 12px);
+      background: var(--border);
+    }
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: .72rem;
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: .1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .step-body {
+      padding: .1rem 0 1.5rem;
+    }
+    .step-body h3 {
+      font-size: .92rem;
+      font-weight: 700;
+      margin-bottom: .3rem;
+    }
+    .step-body p {
+      font-family: 'DM Mono', monospace;
+      font-size: .72rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* FAQ ACCORDION */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      margin-bottom: 2.5rem;
+    }
+    details {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    details[open] { border-color: var(--border-hi); }
+    summary {
+      padding: 1rem 1.1rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: .9rem;
+      font-weight: 600;
+      user-select: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    .summary-inner { display: flex; align-items: center; gap: .75rem; }
+    .q-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: .62rem;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      border-radius: 4px;
+      padding: .1rem .4rem;
+      flex-shrink: 0;
+    }
+    .chevron {
+      color: var(--text-dim);
+      font-size: .8rem;
+      transition: transform .25s;
+      flex-shrink: 0;
+    }
+    details[open] .chevron { transform: rotate(180deg); }
+    .faq-body {
+      padding: 0 1.1rem 1.1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .78rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .faq-body strong { color: var(--text); font-weight: 500; }
+    .faq-body a { color: var(--accent); }
+    .faq-body ul {
+      list-style: disc;
+      padding-left: 1.2rem;
+      margin-top: .5rem;
+    }
+    .faq-body ul li { margin-bottom: .25rem; }
+
+    /* RATES TABLE */
+    .rate-explainer {
+      background: var(--amber-dim);
+      border: 1px solid var(--amber-border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 2rem;
+    }
+    .rate-explainer .re-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--amber);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+    .rate-explainer p {
+      font-family: 'DM Mono', monospace;
+      font-size: .75rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .rate-explainer strong { color: var(--text); }
+
+    /* NETWORKS */
+    .net-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: .6rem;
+      margin-bottom: 2.5rem;
+    }
+    .net-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .7rem .9rem;
+    }
+    .net-item .net-name {
+      font-size: .82rem;
+      font-weight: 700;
+      margin-bottom: .2rem;
+    }
+    .net-item .net-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: .62rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* FORMULA */
+    .formula-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .8rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .78rem;
+      color: var(--text-muted);
+      line-height: 2;
+      margin-top: .5rem;
+    }
+    .formula-box .hi { color: var(--green); font-weight: 500; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <a class="back-link" href="checkout.html">← Volver al checkout</a>
+    <span class="nav-label">FAQ · Pago con Cripto</span>
+  </nav>
+
+  <div class="hero">
+    <p class="tag">// documentación</p>
+    <h1>¿Cómo funciona el<br>checkout <em>cripto</em>?</h1>
+    <p>Todo lo que necesitás saber para empezar a cobrar en USDC/USDT desde tu negocio, sin intermediarios y sin complicaciones técnicas.</p>
+  </div>
+
+  <!-- FLUIDKEY -->
+  <p class="section-label">01 · ¿Qué es FluidKey?</p>
+  <div class="fk-card">
+    <div class="fk-header">
+      <div class="fk-icon">🔑</div>
+      <div>
+        <h2>FluidKey</h2>
+        <p>fluidkey.com · pagos cripto sin custodia</p>
+      </div>
+    </div>
+    <div class="fk-body">
+      <p>
+        <strong>FluidKey es una billetera de cripto sin custodia</strong> que usa <em>stealth addresses</em> (direcciones sigilosas) para proteger la privacidad financiera del comerciante. Tu URL pública tiene el formato <strong>https://tu_alias.fkey.id/</strong> — podés compartirla con cualquier cliente.
+      </p>
+      <p>
+        <strong>El mecanismo clave: cada cobro genera una dirección de depósito nueva y distinta.</strong> Cuando el cliente abre tu QR, FluidKey genera automáticamente una dirección de recepción única para esa transacción — una que nunca fue usada antes y que nadie puede vincular a tu identidad ni a tus otros cobros. Dos clientes que te paguen el mismo día van a ver dos direcciones completamente diferentes.
+      </p>
+      <p>
+        Esto significa que <strong>ningún comprador puede saber cuánto dinero tenés en tu wallet</strong>, cuántas ventas hiciste, ni rastrear tu historial. Un explorador de blockchain como Etherscan ve la transacción, pero no puede saber que esa dirección es tuya. Vos, en cambio, ves todo consolidado en tu dashboard de FluidKey como si fuera una sola wallet.
+      </p>
+      <p>
+        La clave: <strong>vos sos el único que controla tus fondos</strong>. FluidKey no puede mover tu plata, no puede congelar tu cuenta y no procesa el pago. Incluso si FluidKey dejara de existir, podés recuperar tus fondos desde <a href="https://recovery.fluidkey.com" target="_blank">recovery.fluidkey.com</a> con tus claves privadas.
+      </p>
+      <div class="fk-props">
+        <div class="fk-prop">
+          <div class="prop-icon">🔒</div>
+          <div class="prop-title">Sin custodia</div>
+          <div class="prop-desc">Nadie más tiene acceso a tus fondos. Ni FluidKey ni esta herramienta.</div>
+        </div>
+        <div class="fk-prop">
+          <div class="prop-icon">🎭</div>
+          <div class="prop-title">Stealth addresses</div>
+          <div class="prop-desc">Cada cobro genera una dirección nueva. Nadie puede rastrear tu balance ni tu historial.</div>
+        </div>
+        <div class="fk-prop">
+          <div class="prop-icon">⛓️</div>
+          <div class="prop-title">Multi-red</div>
+          <div class="prop-desc">Acepta pagos en Base, Arbitrum, Optimism, Polygon y Gnosis.</div>
+        </div>
+        <div class="fk-prop">
+          <div class="prop-icon">💸</div>
+          <div class="prop-title">Fees bajas</div>
+          <div class="prop-desc">Las fees en redes L2 (Base, Arbitrum, Optimism) son centavos de dólar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOW -->
+  <p class="section-label">02 · Flujo de un cobro</p>
+  <div class="flow">
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>El comerciante ingresa el monto en ARS</h3>
+          <p>Ponés el precio total que querés cobrar, incluyendo impuestos si aplica. La herramienta obtiene automáticamente la cotización USDC/ARS desde CriptoYA.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Se calcula el equivalente en USDC/USDT</h3>
+          <p>Se divide el monto ARS por la tasa promedio de los 4 exchanges y se agrega un buffer del 0.5% para protegerse de variaciones de precio durante el pago.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Se muestra el cartel con el monto + el QR de FluidKey</h3>
+          <p>El cliente ve exactamente cuántos USDC/USDT tiene que enviar y escanea el QR nativo de FluidKey del comerciante.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>El cliente paga desde su wallet</h3>
+          <p>Desde cualquier billetera compatible (MetaMask, Coinbase Wallet, Rainbow, etc.), el cliente elige la red y manda el monto indicado. El pago llega directo a la wallet del comerciante.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>El comerciante confirma la transacción</h3>
+          <p>La confirmación se puede ver on-chain en segundos (en redes L2 como Base o Arbitrum). No hay intermediario: si llegó, llegó.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COTIZACION -->
+  <p class="section-label">03 · Cotización y cálculo</p>
+  <div class="rate-explainer">
+    <p class="re-label">⚡ Promedio de 4 exchanges</p>
+    <p>La tasa se obtiene en tiempo real de <strong>Buenbit, Ripio, Belo y Fiwind</strong> vía la API pública de CriptoYA. Se toma el precio <strong>bid (precio de venta del exchange)</strong> y se calcula el promedio entre los exchanges que respondan correctamente. Si alguno falla, se excluye del promedio automáticamente.</p>
+  </div>
+
+  <div class="formula-box">
+    <span class="hi">Tasa</span> = promedio(Buenbit, Ripio, Belo, Fiwind) <span style="color:var(--text-dim)">// precio bid de cada exchange</span><br>
+    <span class="hi">USD base</span> = ARS ÷ Tasa<br>
+    <span class="hi">Buffer</span> = USD base × 0.5%<br>
+    <span class="hi">Total a cobrar</span> = USD base + Buffer
+  </div>
+
+  <!-- NETWORKS -->
+  <p class="section-label" style="margin-top:2rem;">04 · Redes soportadas</p>
+  <div class="net-grid">
+    <div class="net-item">
+      <div class="net-name">Base</div>
+      <div class="net-desc">L2 de Coinbase. Muy bajo costo. Recomendada para pagos pequeños.</div>
+    </div>
+    <div class="net-item">
+      <div class="net-name">Arbitrum One</div>
+      <div class="net-desc">L2 de Ethereum. Alta liquidez y amplia adopción.</div>
+    </div>
+    <div class="net-item">
+      <div class="net-name">Optimism</div>
+      <div class="net-desc">L2 de Ethereum. Fees muy bajas, rápida confirmación.</div>
+    </div>
+    <div class="net-item">
+      <div class="net-name">Polygon</div>
+      <div class="net-desc">Sidechain de Ethereum. Muy popular en Argentina.</div>
+    </div>
+    <div class="net-item">
+      <div class="net-name">Gnosis Chain</div>
+      <div class="net-desc">Especializada en pagos cotidianos. Fees mínimas.</div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <p class="section-label">05 · Preguntas frecuentes</p>
+  <div class="faq-list">
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿Necesito saber de cripto para cobrar?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        No. Solo necesitás tener creada tu cuenta en <strong>FluidKey</strong> (gratuita) y pegar tu URL en este checkout. El sistema hace el resto: obtiene la cotización, calcula el monto y muestra el QR. El cliente tampoco necesita saber mucho — cualquier app de cripto moderna tiene la opción "escanear QR para pagar".
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿Esta herramienta procesa o toca mis fondos?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        <strong>No.</strong> Esta página es 100% estática. Corre en tu navegador, no tiene backend, no guarda datos y no toca ninguna transacción. Solo muestra el QR de FluidKey del comerciante. El pago ocurre directamente entre la wallet del cliente y la del comerciante, on-chain.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿Por qué se usa un promedio de 4 exchanges?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        Un solo exchange puede tener spreads temporalmente más altos o quedar fuera de línea. Promediar entre <strong>Buenbit, Ripio, Belo y Fiwind</strong> da una tasa más representativa del mercado real y reduce el riesgo de usar un precio desfavorable. Si alguno falla, el promedio se calcula con los que respondan.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿Qué es el buffer del 0.5%?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        Desde que se calcula el monto hasta que el cliente confirma el pago pueden pasar varios minutos. El precio del USDC en ARS puede moverse ligeramente en ese tiempo. El buffer del <strong>0.5%</strong> actúa como margen de seguridad para cubrir esa variación. En términos prácticos: en un cobro de $100 USD, el buffer representa $0.50.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿Qué pasa si el cliente paga en otra red?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        El cliente elige la red desde su wallet al momento de pagar. Lo importante es que envíe <strong>USDC o USDT</strong>, no otro token. FluidKey soporta varias redes:
+        <ul>
+          <li>✅ <strong>Base, Arbitrum, Optimism, Polygon, Gnosis</strong> — recomendadas. Fees de centavos.</li>
+          <li>⚠️ <strong>Ethereum mainnet</strong> — FluidKey la acepta, pero <strong>no es recomendable</strong>: las fees de red pueden ser $5–$30 o más, lo que encarece innecesariamente el pago para el cliente.</li>
+          <li>❌ Otras redes (BSC, Solana, Tron, etc.) — no compatibles con FluidKey directo. No enviar sin confirmar antes.</li>
+        </ul>
+        La recomendación siempre es usar <strong>Base o Arbitrum</strong>: son las más rápidas, baratas y con más adopción actualmente.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿El cliente necesita una app específica?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        No. Cualquier <strong>wallet self-custodial</strong> compatible con las redes soportadas funciona. Algunas opciones populares:
+        <ul>
+          <li><strong>MetaMask</strong> — la más usada, disponible en móvil y extensión de navegador</li>
+          <li><strong>Rabby</strong> — excelente interfaz, muy recomendada para usuarios más avanzados</li>
+          <li><strong>Coinbase Wallet</strong> — fácil de usar, buena integración con Base</li>
+          <li><strong>Rainbow</strong> — muy amigable para móvil</li>
+          <li><strong>Trust Wallet</strong> — amplia compatibilidad de redes</li>
+        </ul>
+        <strong>Importante:</strong> el cliente debe pagar <em>desde su propia wallet self-custodial</em>, no desde un exchange como Binance o Bybit. Los retiros desde exchanges no son instantáneos y pueden demorar minutos o incluso horas, lo cual genera una mala experiencia en el punto de venta.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿Cómo confirmo que recibí el pago?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        La única forma confiable es <strong>verificar directamente en tu app de FluidKey</strong>. Dado que cada cobro genera una dirección de depósito única y nueva (stealth address), es imposible rastrear un pago buscando tu dirección en exploradores de blockchain como Etherscan o Basescan — simplemente no vas a encontrar nada vinculado a vos. Eso es exactamente el punto: esa privacidad es la que protege tu historial de ventas. FluidKey consolida todos esos cobros en tu dashboard y te muestra el balance total. En redes L2, la confirmación suele aparecer en <strong>segundos o pocos minutos</strong>.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿El QR del checkout tiene el monto incluido?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        Actualmente, <strong>el QR nativo de FluidKey no incluye el monto</strong> — solo la dirección de la wallet. El monto calculado se muestra como cartel visible ("Enviar: X USDC/USDT") y el cliente lo ingresa manualmente en su app al confirmar el pago. Es una limitación de la integración actual que puede mejorar en versiones futuras.
+      </div>
+    </details>
+
+    <details>
+      <summary>
+        <div class="summary-inner"><span class="q-tag">Q</span>¿El QR no se ve / aparece bloqueado?</div>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="faq-body">
+        Algunos navegadores bloquean iframes de sitios externos (por políticas de seguridad de FluidKey). Si esto pasa, la página ofrece un enlace directo para abrir tu página de FluidKey en una pestaña nueva. El cliente puede escanear el QR desde ahí, o vos podés mostrarle la pantalla directamente.
+      </div>
+    </details>
+
+  </div>
+
+  <footer>
+    <span>Checkout Cripto · Herramienta local · Sin backend · Sin custodia</span>
+    <a href="https://fluidkey.com" target="_blank">fluidkey.com ↗</a>
+  </footer>
+
+</div>
+</body>
+</html>
