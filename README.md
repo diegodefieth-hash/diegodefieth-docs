@@ -15,6 +15,7 @@ El código no está publicado — estos READMEs están pensados para que cualqui
 | [plantilla-bot](./plantilla-bot/README.md) | Template para documentar bots de home server |
 | [pago-con-cripto](./pago-con-cripto/README.md) | Herramienta estática para cobrar en cripto en un negocio — ARS a USDC/USDT con QR de FluidKey |
 | [trading-bot](./trading-bot/README.md) | Bot de trading automático para Binance Spot — estructura genérica adaptable a cualquier par y estrategia |
+| [bot-gastos](./bot-gastos/README.md) | Bot de Telegram para registrar gastos diarios con categorías, cuotas automáticas y reportes desde Google Sheets |
 ---
 
 ## Stack general
