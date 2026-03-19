@@ -4,6 +4,14 @@ Herramienta estática para cobrar en cripto en un negocio físico o digital.
 Convierte un precio en pesos argentinos a USDC/USDT usando cotización en tiempo real,
 y muestra el QR de pago de [FluidKey](https://fluidkey.com) del comerciante.
 
+## 🌐 Ver en vivo
+
+👉 **[diegodefieth-hash.github.io/diegodefieth-docs/pago-con-cripto/checkout.html](https://diegodefieth-hash.github.io/diegodefieth-docs/pago-con-cripto/checkout.html)**
+
+Herramienta estática para cobrar en cripto en un negocio físico o digital.
+Convierte un precio en pesos argentinos a USDC/USDT usando cotización en tiempo real,
+y muestra el QR de pago de [FluidKey](https://fluidkey.com) del comerciante.
+
 > **Bien público.** Tomá el código, adaptalo a tu negocio, usalo como quieras.
 > Solo se pide que menciones al creador: [@diegodefieth-hash](https://github.com/diegodefieth-hash)
 
