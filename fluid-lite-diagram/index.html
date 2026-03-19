@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluid Lite — USD Vault Flow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #080c14;
+    --panel: #0d1420;
+    --border: #1a2640;
+    --accent: #00d4ff;
+    --accent2: #7b5ea7;
+    --accent3: #00ff94;
+    --text: #c8d8f0;
+    --muted: #4a6080;
+    --warn: #ff6b35;
+    --gold: #f5c518;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── MAIN FLOW ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Row with nodes + connectors */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    position: relative;
+  }
+
+  /* Vertical connector between rows */
+  .v-connector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    position: relative;
+  }
+
+  .v-connector::before {
+    content: '';
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    opacity: 0.5;
+  }
+
+  .v-arrow {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent2);
+    font-size: 16px;
+    opacity: 0.8;
+  }
+
+  /* Horizontal connector */
+  .h-connector {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, var(--accent), var(--accent2));
+    opacity: 0.35;
+    position: relative;
+    max-width: 60px;
+  }
+
+  .h-connector::after {
+    content: '▶';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent2);
+    font-size: 10px;
+    opacity: 0.8;
+  }
+
+  /* NODE BASE */
+  .node {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+
+  .node:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+
+  .node-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .node-label {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .node-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .node-sub {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* USER node */
+  .node-user {
+    border-color: rgba(0,212,255,0.4);
+    box-shadow: 0 0 30px rgba(0,212,255,0.08);
+    min-width: 200px;
+    text-align: center;
+  }
+  .node-user:hover { border-color: var(--accent); box-shadow: 0 0 30px rgba(0,212,255,0.2); }
+
+  /* VAULT node */
+  .node-vault {
+    border-color: rgba(123,94,167,0.5);
+    box-shadow: 0 0 30px rgba(123,94,167,0.1);
+    min-width: 260px;
+    text-align: center;
+    background: linear-gradient(135deg, #0d1420, #12102a);
+  }
+  .node-vault:hover { border-color: var(--accent2); }
+
+  /* STRATEGY HANDLER */
+  .node-handler {
+    border-color: rgba(0,255,148,0.3);
+    min-width: 220px;
+    text-align: center;
+    background: linear-gradient(135deg, #0d1420, #0a1a14);
+  }
+  .node-handler:hover { border-color: var(--accent3); box-shadow: 0 0 30px rgba(0,255,148,0.15); }
+
+  /* CHAINS row */
+  .chains-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .node-chain {
+    min-width: 150px;
+    text-align: center;
+    border-color: rgba(245,197,24,0.25);
+    background: linear-gradient(135deg, #0d1420, #1a1608);
+  }
+  .node-chain:hover { border-color: var(--gold); box-shadow: 0 0 20px rgba(245,197,24,0.15); }
+
+  /* ASSETS row */
+  .assets-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .node-asset {
+    text-align: center;
+    padding: 16px 14px;
+  }
+
+  .node-asset.susde { border-color: rgba(0,212,255,0.3); }
+  .node-asset.susde:hover { border-color: var(--accent); }
+
+  .node-asset.syrup { border-color: rgba(123,94,167,0.4); }
+  .node-asset.syrup:hover { border-color: var(--accent2); }
+
+  .node-asset.susdai { border-color: rgba(0,255,148,0.3); }
+  .node-asset.susdai:hover { border-color: var(--accent3); }
+
+  /* LOOP SECTION */
+  .loop-box {
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 16px;
+    padding: 24px;
+    background: linear-gradient(135deg, #0d1420, #1a0e08);
+    position: relative;
+    margin: 0 auto;
+    max-width: 700px;
+    width: 100%;
+  }
+
+  .loop-box-label {
+    position: absolute;
+    top: -12px;
+    left: 24px;
+    background: var(--bg);
+    padding: 0 10px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--warn);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .loop-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .loop-step {
+    text-align: center;
+    padding: 10px 14px;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .loop-step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--warn);
+    margin-bottom: 6px;
+    opacity: 0.7;
+  }
+
+  .loop-step-text {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .loop-arrow {
+    font-size: 18px;
+    color: var(--warn);
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  .loop-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255,107,53,0.4);
+    border-radius: 50%;
+    font-size: 16px;
+    color: var(--warn);
+    flex-shrink: 0;
+  }
+
+  /* OUTPUT node */
+  .node-output {
+    border-color: rgba(0,255,148,0.4);
+    box-shadow: 0 0 30px rgba(0,255,148,0.08);
+    min-width: 260px;
+    text-align: center;
+    background: linear-gradient(135deg, #0d1420, #0a1a14);
+  }
+  .node-output:hover { border-color: var(--accent3); box-shadow: 0 0 30px rgba(0,255,148,0.2); }
+
+  /* FEES & RISKS panels */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .info-panel {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    background: var(--panel);
+  }
+
+  .info-panel-title {
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .info-panel-title.fees { color: var(--gold); }
+  .info-panel-title.risks { color: var(--warn); }
+
+  .info-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .info-item .dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 6px;
+  }
+  .fees .dot { background: var(--gold); }
+  .risks .dot { background: var(--warn); }
+
+  .tag {
+    display: inline-block;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .tag.green {
+    background: rgba(0,255,148,0.1);
+    border-color: rgba(0,255,148,0.2);
+    color: var(--accent3);
+  }
+
+  .tag.orange {
+    background: rgba(255,107,53,0.1);
+    border-color: rgba(255,107,53,0.2);
+    color: var(--warn);
+  }
+
+  .tag.gold {
+    background: rgba(245,197,24,0.1);
+    border-color: rgba(245,197,24,0.2);
+    color: var(--gold);
+  }
+
+  /* Section titles */
+  .section-label {
+    text-align: center;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* Animated flow lines */
+  @keyframes flowDown {
+    0% { opacity: 0; transform: translateY(-8px); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(8px); }
+  }
+
+  .flow-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: flowDown 2s infinite;
+  }
+
+  @media (max-width: 700px) {
+    .assets-row { grid-template-columns: repeat(2, 1fr); }
+    .info-grid { grid-template-columns: 1fr; }
+    .chains-row .node-chain { min-width: 120px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">USD VAULT · SISTEMA COMPLETO</div>
+    <h1>Fluid Lite <span>fLiteUSD</span></h1>
+    <p class="subtitle">Cómo fluye tu USDC desde el depósito hasta el yield</p>
+  </header>
+
+  <div class="flow">
+
+    <!-- USUARIO -->
+    <div class="row">
+      <div class="node node-user">
+        <span class="node-icon">👤</span>
+        <div class="node-label">Tú</div>
+        <div class="node-title">Depositás USDC</div>
+        <div class="node-sub">Recibís <strong style="color:var(--accent)">fLiteUSD</strong> en tu wallet<br>
+          <span class="tag" style="margin-top:6px;display:inline-block">ERC-4626</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- VAULT -->
+    <div class="row">
+      <div class="node node-vault">
+        <span class="node-icon">🏦</span>
+        <div class="node-label">Vault principal</div>
+        <div class="node-title">fLiteUSD Vault</div>
+        <div class="node-sub">
+          USDC idle → <strong>fUSDC</strong> en Fluid<br>
+          Exchange rate sube continuamente<br>
+          <span class="tag" style="margin-top:6px;display:inline-block">Ethereum Mainnet</span>
+          <span class="tag gold" style="margin-top:6px;display:inline-block">Base rate: 6%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- STRATEGY HANDLER -->
+    <div class="row">
+      <div class="node node-handler">
+        <span class="node-icon">⚙️</span>
+        <div class="node-label">Coordinador</div>
+        <div class="node-title">Strategy Handler</div>
+        <div class="node-sub">
+          Distribuye capital entre cadenas<br>
+          via <strong>CCIP</strong> (Chainlink) y <strong>LayerZero</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- CHAINS -->
+    <div class="section-label">Estrategias multi-cadena</div>
+    <div class="chains-row">
+      <div class="node node-chain">
+        <span class="node-icon">🔷</span>
+        <div class="node-label">Cadena 1</div>
+        <div class="node-title">Ethereum</div>
+        <div class="node-sub">Aave V3 · Fluid</div>
+      </div>
+      <div class="node node-chain">
+        <span class="node-icon">🔵</span>
+        <div class="node-label">Cadena 2</div>
+        <div class="node-title">Arbitrum</div>
+        <div class="node-sub">Aave V3 · Fluid</div>
+      </div>
+      <div class="node node-chain">
+        <span class="node-icon">🟣</span>
+        <div class="node-label">Cadena 3</div>
+        <div class="node-title">Plasma</div>
+        <div class="node-sub">Fluid</div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- ACTIVOS -->
+    <div class="section-label">Activos yield-bearing utilizados</div>
+    <div class="assets-row">
+      <div class="node node-asset susde">
+        <span class="node-icon">🔵</span>
+        <div class="node-label">Ethena</div>
+        <div class="node-title">sUSDe</div>
+        <div class="node-sub">Funding rates<br>+ ETH staking<br><span style="color:var(--accent);font-size:11px">7–18% variable</span></div>
+      </div>
+      <div class="node node-asset syrup">
+        <span class="node-icon">🟣</span>
+        <div class="node-label">Maple</div>
+        <div class="node-title">syrupUSDC</div>
+        <div class="node-sub">Préstamos inst.<br>sobrecolateralizados<br><span style="color:var(--accent2);font-size:11px">~7% estable</span></div>
+      </div>
+      <div class="node node-asset syrup">
+        <span class="node-icon">🟣</span>
+        <div class="node-label">Maple</div>
+        <div class="node-title">syrupUSDT</div>
+        <div class="node-sub">Préstamos inst.<br>sobrecolateralizados<br><span style="color:var(--accent2);font-size:11px">~7% estable</span></div>
+      </div>
+      <div class="node node-asset susdai">
+        <span class="node-icon">🤖</span>
+        <div class="node-label">USD.AI · Permian Labs</div>
+        <div class="node-title">sUSDai</div>
+        <div class="node-sub">Préstamos a ops.<br>de GPU (IA) · RWA<br><span style="color:var(--accent3);font-size:11px">10–15% APR</span></div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- sUSDai liquidity note -->
+    <div style="display:flex;justify-content:center;margin-bottom:4px;">
+      <div style="
+        border:1px solid rgba(0,255,148,0.25);
+        border-radius:12px;
+        padding:14px 20px;
+        background:linear-gradient(135deg,#0d1420,#0a1a14);
+        max-width:680px;
+        width:100%;
+        display:flex;
+        gap:14px;
+        align-items:flex-start;
+      ">
+        <span style="font-size:20px;flex-shrink:0">💡</span>
+        <div>
+          <div style="font-size:11px;font-family:'Space Mono',monospace;color:var(--accent3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">sUSDai · Solución al unstaking de 30 días</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            sUSDai requiere ~30 días para unstakear directamente en USD.AI (cola de liquidez por repagos de préstamos GPU).
+            Fluid <strong style="color:var(--accent3)">no hace unstaking</strong> — usa sUSDai como colateral en loops de lending y,
+            cuando necesita liquidez, lo <strong style="color:var(--accent3)">swapea en su propio DEX</strong>,
+            donde Fluid es el principal hub de liquidez para sUSDai.
+            El usuario no espera nada.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- LOOP -->
+    <div class="section-label">Estrategia de leverage recursivo (amplificación)</div>
+    <div class="loop-box">
+      <span class="loop-box-label">⟳ Loop automático</span>
+      <div class="loop-steps">
+        <div class="loop-step">
+          <div class="loop-step-num">PASO 1</div>
+          <div class="loop-step-text">Depositar activo yield-bearing como colateral</div>
+        </div>
+        <div class="loop-arrow">→</div>
+        <div class="loop-step">
+          <div class="loop-step-num">PASO 2</div>
+          <div class="loop-step-text">Pedir prestado stablecoin contra ese colateral</div>
+        </div>
+        <div class="loop-arrow">→</div>
+        <div class="loop-step">
+          <div class="loop-step-num">PASO 3</div>
+          <div class="loop-step-text">Swapear lo prestado a más colateral yield-bearing</div>
+        </div>
+        <div class="loop-arrow">→</div>
+        <div class="loop-circle">↺</div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- RECONCILIACION -->
+    <div class="row">
+      <div class="node" style="min-width:260px;text-align:center;border-color:rgba(245,197,24,0.3);background:linear-gradient(135deg,#0d1420,#1a1608)">
+        <span class="node-icon">📊</span>
+        <div class="node-label">Cada domingo</div>
+        <div class="node-title">Reconciliación semanal</div>
+        <div class="node-sub">
+          Agrega NAV de todas las cadenas<br>
+          Pausa bridges ~3–4 horas<br>
+          Actualiza el exchange rate
+        </div>
+      </div>
+    </div>
+
+    <div class="v-connector"><span class="v-arrow">▼</span></div>
+
+    <!-- OUTPUT -->
+    <div class="row">
+      <div class="node node-output">
+        <span class="node-icon">💚</span>
+        <div class="node-label">Al retirar</div>
+        <div class="node-title">Recibís más USDC</div>
+        <div class="node-sub">
+          fLiteUSD → USDC a exchange rate creciente<br>
+          <span class="tag orange" style="margin-top:8px;display:inline-block">Exit fee: 0.05%</span>
+          <span class="tag green" style="margin-top:8px;display:inline-block">Sin performance fee</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <!-- INFO PANELS -->
+  <div class="info-grid">
+    <div class="info-panel">
+      <div class="info-panel-title fees">💰 Costos al usuario</div>
+      <div class="info-item fees">
+        <div class="dot"></div>
+        <div><strong>Exit fee 0.05%</strong> al retirar. Va al DAO como revenue del protocolo.</div>
+      </div>
+      <div class="info-item fees">
+        <div class="dot"></div>
+        <div><strong>Sin performance fee</strong> en el USD Vault (el ETH Vault sí cobra 20% sobre ganancias).</div>
+      </div>
+      <div class="info-item fees">
+        <div class="dot"></div>
+        <div><strong>Gas de Ethereum</strong> para depositar y retirar. El vault minimiza las transacciones internas.</div>
+      </div>
+      <div class="info-item fees">
+        <div class="dot"></div>
+        <div><strong>Retiros muy cortos</strong>: el yield puede no cubrir el 0.05% de exit fee.</div>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <div class="info-panel-title risks">⚠️ Riesgos clave</div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>Smart contracts</strong>: bugs, oráculos manipulados o errores en automatización.</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>Multi-protocolo</strong>: si Aave o Fluid sufren pérdidas, las asumís en proporción.</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>sUSDe — Ethena</strong>: funding rates de perpetuos pueden tornarse negativos en mercados bajistas, comprimiendo o eliminando el yield. El colateral depende de exchanges centralizados y custodios off-chain.</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>syrupUSDC/USDT — Maple</strong>: si instituciones prestatarias defaultean y el colateral no cubre, las pérdidas pasan a los lenders. Históricamente sin pérdidas, pero no hay garantías.</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>sUSDai — RWA AI</strong>: si operadores de GPU defaultean o la demanda de compute cae, el yield y el capital de ese tramo se ven afectados. Riesgo de burbuja AI.</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>Slippage en rebalanceos</strong>: el vault puede liquidar colateral con pérdida bajo mercados adversos.</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>Pausas de emergencia</strong>: el Team Multi-Sig puede pausar retiros temporalmente (sin mover fondos).</div>
+      </div>
+      <div class="info-item risks">
+        <div class="dot"></div>
+        <div><strong>Governance</strong>: el DAO puede cambiar parámetros, agregar o quitar protocolos sin aviso.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:32px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">
+    Fuente: lite.guides.instadapp.io · usd.ai · Actualizado con corrección sUSDai (USD.AI, no Sky Protocol)
+  </div>
+
+</div>
+</body>
+</html>

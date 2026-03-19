@@ -17,6 +17,7 @@ El código no está publicado — estos READMEs están pensados para que cualqui
 | [trading-bot](./trading-bot/README.md) | Bot de trading automático para Binance Spot — estructura genérica adaptable a cualquier par y estrategia |
 | [bot-gastos](./bot-gastos/README.md) | Bot de Telegram para registrar gastos diarios con categorías, cuotas automáticas y reportes desde Google Sheets |
 | [dashboard-gastos](./dashboard-gastos/README.md) | Panel web para visualizar gastos de bot-gastos — lee directo de Google Sheets, sin base de datos |
+| [fluid-lite-diagram](./fluid-lite-diagram/index.html) | Diagrama interactivo del sistema Fluid Lite USD Vault — flujo completo desde depósito hasta yield, activos, estrategia de leverage y riesgos |
 ---
 
 ## Stack general
