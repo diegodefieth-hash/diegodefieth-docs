@@ -1,4 +1,4 @@
-# Diego DeFi — Bots & Herramientas
+# Diego DeFi — Bots, Herramientas & Recursos DeFi
 
 Documentación de los bots y herramientas que desarrollo y corro en mi servidor personal.
 Cada carpeta contiene el README completo de un proyecto: qué hace, cómo instalarlo, cómo configurarlo y cómo operarlo.
