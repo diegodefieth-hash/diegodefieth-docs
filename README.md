@@ -18,6 +18,7 @@ El código no está publicado — estos READMEs están pensados para que cualqui
 | [bot-gastos](./bot-gastos/README.md) | Agente conversacional de gastos personales vía Telegram con IA — lenguaje natural, edición, borrado y memoria de categorías. Datos en Google Sheets |
 | [dashboard-gastos](./dashboard-gastos/README.md) | Panel web para visualizar gastos de bot-gastos — lee directo de Google Sheets, sin base de datos. Incluye demo interactiva |
 | [fluid-lite-diagram](./fluid-lite-diagram/index.html) | Diagrama interactivo del sistema Fluid Lite USD Vault — flujo completo desde depósito hasta yield, activos, estrategia de leverage y riesgos |
+| [web-noticias](./web-noticias/README.md) | Web pública de noticias generadas por IA — resumen diario automatizado de política argentina y economía mundial. Deploy en Vercel. 🌐 [Ver sitio](https://web-noticias-three.vercel.app/) |
 ---
 
 ## Stack general

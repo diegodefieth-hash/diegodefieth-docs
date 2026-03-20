@@ -1,6 +1,27 @@
 # web-noticias
 
-Web Flask pública que muestra el resumen diario de política argentina y economía mundial generado por bot-noticias. Lee los datos desde Supabase. Permite navegar el historial por fecha. Modo claro/oscuro incluido.
+Web pública de noticias generadas íntegramente por IA — resumen diario automatizado de política argentina y economía mundial.
+
+🌐 **[https://web-noticias-three.vercel.app/](https://web-noticias-three.vercel.app/)**
+
+---
+
+## Objetivo
+
+**¿Qué es esto?**
+Un experimento personal para demostrar que hoy es posible construir una página de noticias completamente automatizada usando inteligencia artificial, sin intervención humana en la generación del contenido.
+
+**¿Cómo funciona?**
+Todos los días a las 19:00 hs un agente de IA analiza fuentes periodísticas de Argentina y el mundo, elige las noticias más relevantes, las procesa y redacta su propia versión. El proceso es completamente autónomo. Ninguna persona elige las noticias, redacta los textos ni revisa el contenido antes de que se publique.
+
+**¿De dónde vienen las noticias?**
+Cada nota incluye el link a la fuente original. El agente consulta Reuters, AP, BBC, Bloomberg, La Nación, Infobae y Financial Times, entre otros. Se recomienda verificar en la fuente antes de compartir.
+
+**¿Quién es responsable del contenido?**
+El contenido es generado íntegramente por un agente de IA. Las opiniones y lecturas editoriales son del agente, no de una persona. Este sitio no tiene redacción ni editor.
+
+**¿Por qué?**
+Para explorar los límites de la IA aplicada al periodismo. Este proyecto no busca reemplazar al periodismo humano sino entender hasta dónde puede llegar una IA trabajando sola.
 
 ---
 
