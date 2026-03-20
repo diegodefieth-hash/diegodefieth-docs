@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gastos · Dashboard Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #070b16;
+      --card: #0c1226;
+      --card2: #0b1022;
+      --text: #e7ebff;
+      --muted: #a7b0d6;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --accent: #506eff;
+      --accent2: #ffa050;
+      --accent3: #50e8a0;
+      --red: #ff6a6a;
+      --green: #50e89a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(80,110,255,.25), transparent 60%),
+        radial-gradient(1200px 600px at 80% 0%, rgba(255,160,80,.18), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 18px 56px; }
+
+    .demo-banner {
+      background: rgba(80,110,255,.12);
+      border: 1px solid rgba(80,110,255,.3);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .demo-banner a { color: var(--accent); text-decoration: none; }
+    .demo-banner a:hover { text-decoration: underline; }
+
+    .top {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      padding: 18px 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      margin-bottom: 16px;
+    }
+    .top-left { display: flex; flex-direction: column; gap: 3px; }
+    .top-left h1 { font-size: 19px; font-weight: 600; letter-spacing: .2px; }
+    .top-left p { font-size: 13px; color: var(--muted); }
+    .top-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    select {
+      font-family: inherit;
+      font-size: 13px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 32px 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a7b0d6' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color .2s;
+    }
+    select:hover { border-color: rgba(255,255,255,.2); }
+    select option { background: #0c1226; color: var(--text); }
+
+    .tabs {
+      display: flex; gap: 4px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      width: fit-content;
+      margin-bottom: 18px;
+    }
+    .tab {
+      font-family: inherit; font-size: 13px;
+      padding: 7px 18px; border-radius: 9px;
+      cursor: pointer; color: var(--muted);
+      border: none; background: transparent;
+      transition: all .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { background: rgba(80,110,255,.25); color: var(--text); border: 1px solid rgba(80,110,255,.4); }
+
+    .section { display: none; flex-direction: column; gap: 18px; }
+    .section.active { display: flex; }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+
+    .kpi {
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--kpi-color, var(--accent));
+    }
+    .kpi-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .kpi-value { font-size: 26px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+    .kpi-value .currency { font-size: 14px; color: var(--muted); font-weight: 400; margin-right: 2px; }
+    .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .card-title {
+      font-size: 12px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .08em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+    .dot.o { background: var(--accent2); }
+    .dot.g { background: var(--accent3); }
+
+    .cat-list { display: flex; flex-direction: column; gap: 10px; }
+    .cat-row { display: grid; grid-template-columns: 130px 1fr auto; align-items: center; gap: 10px; }
+    .cat-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cat-bar-bg { height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+    .cat-bar { height: 4px; border-radius: 2px; }
+    .cat-amt { font-size: 12px; color: var(--muted); text-align: right; white-space: nowrap; min-width: 90px; }
+
+    .scroll-y { max-height: 340px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.1) transparent; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      font-size: 11px; color: var(--muted); text-align: left;
+      padding: 6px 10px; border-bottom: 1px solid var(--border);
+      text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;
+      cursor: pointer; user-select: none;
+    }
+    th:hover { color: var(--text); }
+    th.asc::after  { content: ' ↑'; color: var(--accent); }
+    th.desc::after { content: ' ↓'; color: var(--accent); }
+    th::after { content: ' ↕'; opacity: .3; font-size: 10px; }
+    td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,.04); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    .mono { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+    .pill {
+      font-size: 10px; padding: 2px 8px; border-radius: 4px;
+      background: rgba(255,255,255,.07); color: var(--muted); white-space: nowrap;
+    }
+    .pill-cuota { background: rgba(255,160,80,.12); color: var(--accent2); }
+    .text-right { text-align: right; }
+
+    .comp-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .vs { font-size: 12px; color: var(--muted); }
+
+    .btn {
+      font-family: inherit; font-size: 13px;
+      background: rgba(80,110,255,.2); border: 1px solid rgba(80,110,255,.4);
+      color: var(--text); padding: 8px 18px; border-radius: 10px;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn:hover { background: rgba(80,110,255,.3); }
+
+    .comp-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .comp-box {
+      background: rgba(255,255,255,.04); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 18px;
+    }
+    .comp-box-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+    .comp-box-val { font-size: 22px; font-weight: 700; letter-spacing: -.5px; }
+    .comp-box-val.m1 { color: #7090ff; }
+    .comp-box-val.m2 { color: var(--accent2); }
+
+    .delta {
+      display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-left: 8px;
+    }
+    .delta.up { background: rgba(255,106,106,.15); color: var(--red); }
+    .delta.down { background: rgba(80,232,154,.15); color: var(--green); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="demo-banner">
+    🧪 <strong>Demo con datos ficticios</strong> — Este es un preview estático del dashboard.
+    Código y documentación en <a href="https://github.com/diegodefieth-hash/diegodefieth-docs/tree/main/dashboard-gastos" target="_blank">GitHub</a>.
+  </div>
+
+  <div class="top">
+    <div class="top-left">
+      <h1>💸 Dashboard Gastos</h1>
+      <p>Panel personal · Google Sheets · solo lectura</p>
+    </div>
+    <div class="top-right">
+      <select id="mes-select"></select>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="resumen">Resumen</button>
+    <button class="tab" data-tab="detalle">Detalle</button>
+    <button class="tab" data-tab="cuotas">Cuotas</button>
+    <button class="tab" data-tab="comparar">Comparar</button>
+  </div>
+
+  <!-- RESUMEN -->
+  <section class="section active" id="tab-resumen">
+    <div class="kpi-row" id="kpi-row"></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Distribución por categoría</div>
+        <div style="max-width:300px;margin:0 auto;width:100%">
+          <canvas id="chart-pie"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot o"></span>Categorías · detalle</div>
+        <div class="cat-list" id="cat-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETALLE -->
+  <section class="section" id="tab-detalle">
+    <div class="card">
+      <div class="card-title"><span class="dot g"></span>Gastos reales · listado completo</div>
+      <div class="scroll-y" id="items-wrap"></div>
+    </div>
+  </section>
+
+  <!-- CUOTAS -->
+  <section class="section" id="tab-cuotas">
+    <div class="kpi-row">
+      <div class="kpi" style="--kpi-color: var(--accent2)">
+        <div class="kpi-label">Total comprometido</div>
+        <div class="kpi-value" id="kpi-cuotas-total"><span class="currency">$</span>—</div>
+        <div class="kpi-sub" id="kpi-cuotas-count">— cuotas activas</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot o"></span>Cuotas informativas</div>
+      <div class="scroll-y" id="cuotas-wrap"></div>
+    </div>
+  </section>
+
+  <!-- COMPARAR -->
+  <section class="section" id="tab-comparar">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Seleccionar meses</div>
+      <div class="comp-controls">
+        <span class="vs">Mes 1</span>
+        <select id="comp-mes1"></select>
+        <span class="vs">vs</span>
+        <select id="comp-mes2"></select>
+        <button class="btn" onclick="renderComparacion()">Comparar</button>
+      </div>
+    </div>
+    <div class="comp-totals" id="comp-totals" style="display:none"></div>
+    <div class="card" id="comp-chart-card" style="display:none">
+      <div class="card-title"><span class="dot"></span>Comparación por categoría</div>
+      <canvas id="chart-comp" style="max-height:320px"></canvas>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// ── Datos ficticios ──────────────────────────────────────────────────────────
+const PALETTE = ['#506eff','#ffa050','#50e8a0','#ff6a6a','#50c8ff','#e050ff','#c8ff50','#ffe050'];
+
+const DEMO = {
+  '2026-03': {
+    total_real: 487300,
+    total_informativo: 156000,
+    por_categoria: { 'Hogar': 182000, 'Deudas/Cuotas': 98500, 'Hormiga': 74200, 'Personales': 61400, 'Mascotas': 43800, 'Hijos': 27400 },
+    items: [
+      { fecha: '2026-03-01', concepto: 'alquiler', categoria: 'Hogar', monto: 120000 },
+      { fecha: '2026-03-01', concepto: 'expensas', categoria: 'Hogar', monto: 28000 },
+      { fecha: '2026-03-03', concepto: 'supermercado', categoria: 'Hogar', monto: 34000 },
+      { fecha: '2026-03-04', concepto: 'café', categoria: 'Hormiga', monto: 2800 },
+      { fecha: '2026-03-05', concepto: 'veterinaria', categoria: 'Mascotas', monto: 18500 },
+      { fecha: '2026-03-06', concepto: 'delivery pizza', categoria: 'Hormiga', monto: 9400 },
+      { fecha: '2026-03-07', concepto: 'notebook 6c', categoria: 'Deudas/Cuotas', monto: 48000 },
+      { fecha: '2026-03-08', concepto: 'ropa', categoria: 'Personales', monto: 27000 },
+      { fecha: '2026-03-09', concepto: 'cuota colegio', categoria: 'Hijos', monto: 27400 },
+      { fecha: '2026-03-10', concepto: 'internet', categoria: 'Hogar', monto: 8200 },
+      { fecha: '2026-03-11', concepto: 'uber', categoria: 'Hormiga', monto: 4100 },
+      { fecha: '2026-03-12', concepto: 'farmacia', categoria: 'Personales', monto: 12600 },
+      { fecha: '2026-03-13', concepto: 'alimento perro', categoria: 'Mascotas', monto: 14800 },
+      { fecha: '2026-03-14', concepto: 'tarjeta visa', categoria: 'Deudas/Cuotas', monto: 50500 },
+      { fecha: '2026-03-15', concepto: 'kiosco', categoria: 'Hormiga', monto: 1800 },
+      { fecha: '2026-03-16', concepto: 'celular 3c', categoria: 'Deudas/Cuotas', monto: 0 },
+      { fecha: '2026-03-17', concepto: 'transporte sube', categoria: 'Hormiga', monto: 3200 },
+      { fecha: '2026-03-18', concepto: 'gimnasio', categoria: 'Personales', monto: 12800 },
+      { fecha: '2026-03-19', concepto: 'luz', categoria: 'Hogar', monto: 6400 },
+      { fecha: '2026-03-20', concepto: 'sushi', categoria: 'Hormiga', monto: 28900 },
+      { fecha: '2026-03-21', concepto: 'higiene', categoria: 'Personales', monto: 9000 },
+      { fecha: '2026-03-25', concepto: 'gas', categoria: 'Hogar', monto: 5400 },
+    ],
+    cuotas: [
+      { concepto: 'notebook', categoria: 'Personales', cuota: '1/6', monto: 48000 },
+      { concepto: 'celular', categoria: 'Personales', cuota: '3/6', monto: 38000 },
+      { concepto: 'zapatillas', categoria: 'Personales', cuota: '2/3', monto: 27000 },
+      { concepto: 'tablet', categoria: 'Personales', cuota: '5/12', monto: 43000 },
+    ]
+  },
+  '2026-02': {
+    total_real: 412800,
+    total_informativo: 108000,
+    por_categoria: { 'Hogar': 165000, 'Deudas/Cuotas': 84000, 'Hormiga': 68400, 'Personales': 52200, 'Mascotas': 28800, 'Hijos': 14400 },
+    items: [
+      { fecha: '2026-02-01', concepto: 'alquiler', categoria: 'Hogar', monto: 120000 },
+      { fecha: '2026-02-01', concepto: 'expensas', categoria: 'Hogar', monto: 25000 },
+      { fecha: '2026-02-04', concepto: 'supermercado', categoria: 'Hogar', monto: 20000 },
+      { fecha: '2026-02-05', concepto: 'café', categoria: 'Hormiga', monto: 2400 },
+      { fecha: '2026-02-07', concepto: 'delivery', categoria: 'Hormiga', monto: 8800 },
+      { fecha: '2026-02-10', concepto: 'internet', categoria: 'Hogar', monto: 8200 },
+      { fecha: '2026-02-12', concepto: 'tarjeta visa', categoria: 'Deudas/Cuotas', monto: 84000 },
+      { fecha: '2026-02-14', concepto: 'ropa', categoria: 'Personales', monto: 31000 },
+      { fecha: '2026-02-15', concepto: 'cuota colegio', categoria: 'Hijos', monto: 14400 },
+      { fecha: '2026-02-18', concepto: 'veterinaria', categoria: 'Mascotas', monto: 28800 },
+      { fecha: '2026-02-20', concepto: 'gimnasio', categoria: 'Personales', monto: 12800 },
+      { fecha: '2026-02-22', concepto: 'uber', categoria: 'Hormiga', monto: 5200 },
+      { fecha: '2026-02-25', concepto: 'luz', categoria: 'Hogar', monto: 6200 },
+      { fecha: '2026-02-26', concepto: 'gas', categoria: 'Hogar', monto: 5600 },
+      { fecha: '2026-02-28', concepto: 'farmacia', categoria: 'Personales', monto: 8400 },
+    ],
+    cuotas: [
+      { concepto: 'celular', categoria: 'Personales', cuota: '2/6', monto: 38000 },
+      { concepto: 'zapatillas', categoria: 'Personales', cuota: '1/3', monto: 27000 },
+      { concepto: 'tablet', categoria: 'Personales', cuota: '4/12', monto: 43000 },
+    ]
+  },
+  '2026-01': {
+    total_real: 389500,
+    total_informativo: 70000,
+    por_categoria: { 'Hogar': 158000, 'Hormiga': 72000, 'Personales': 68000, 'Deudas/Cuotas': 56000, 'Mascotas': 22000, 'Hijos': 13500 },
+    items: [
+      { fecha: '2026-01-02', concepto: 'alquiler', categoria: 'Hogar', monto: 120000 },
+      { fecha: '2026-01-02', concepto: 'expensas', categoria: 'Hogar', monto: 23000 },
+      { fecha: '2026-01-05', concepto: 'supermercado', categoria: 'Hogar', monto: 15000 },
+      { fecha: '2026-01-06', concepto: 'delivery', categoria: 'Hormiga', monto: 12000 },
+      { fecha: '2026-01-08', concepto: 'ropa verano', categoria: 'Personales', monto: 38000 },
+      { fecha: '2026-01-10', concepto: 'internet', categoria: 'Hogar', monto: 8200 },
+      { fecha: '2026-01-12', concepto: 'cuota colegio', categoria: 'Hijos', monto: 13500 },
+      { fecha: '2026-01-14', concepto: 'tarjeta visa', categoria: 'Deudas/Cuotas', monto: 56000 },
+      { fecha: '2026-01-15', concepto: 'veterinaria', categoria: 'Mascotas', monto: 22000 },
+      { fecha: '2026-01-18', concepto: 'transporte', categoria: 'Hormiga', monto: 8000 },
+      { fecha: '2026-01-20', concepto: 'gimnasio', categoria: 'Personales', monto: 12800 },
+      { fecha: '2026-01-22', concepto: 'farmacia', categoria: 'Personales', monto: 9200 },
+      { fecha: '2026-01-24', concepto: 'kiosco', categoria: 'Hormiga', monto: 2400 },
+      { fecha: '2026-01-25', concepto: 'luz', categoria: 'Hogar', monto: 5800 },
+      { fecha: '2026-01-28', concepto: 'café', categoria: 'Hormiga', monto: 2600 },
+    ],
+    cuotas: [
+      { concepto: 'celular', categoria: 'Personales', cuota: '1/6', monto: 38000 },
+      { concepto: 'tablet', categoria: 'Personales', cuota: '3/12', monto: 32000 },
+    ]
+  }
+};
+
+const MESES = Object.keys(DEMO);
+
+// ── Utils ──────────────────────────────────────────────────────────────────────
+function fmt(n) {
+  return new Intl.NumberFormat('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Math.round(n));
+}
+function pct(part, total) { return total ? ((part / total) * 100).toFixed(1) : '0.0'; }
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+let chartPie = null, chartComp = null;
+
+const TOOLTIP = {
+  backgroundColor: '#0c1226',
+  borderColor: 'rgba(255,255,255,.1)',
+  borderWidth: 1,
+  titleColor: '#e7ebff',
+  bodyColor: '#a7b0d6',
+  padding: 10
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+function init() {
+  const sel = document.getElementById('mes-select');
+  const s1  = document.getElementById('comp-mes1');
+  const s2  = document.getElementById('comp-mes2');
+
+  sel.innerHTML = MESES.map(m => `<option value="${m}">${m}</option>`).join('');
+  s1.innerHTML  = MESES.map(m => `<option value="${m}">${m}</option>`).join('');
+  s2.innerHTML  = MESES.map((m, i) => `<option value="${m}" ${i === 1 ? 'selected' : ''}>${m}</option>`).join('');
+
+  loadMes(MESES[0]);
+  sel.addEventListener('change', () => loadMes(sel.value));
+}
+
+function loadMes(mes) {
+  renderResumen(mes);
+  renderDetalle(mes);
+  renderCuotas(mes);
+}
+
+// ── Resumen ────────────────────────────────────────────────────────────────────
+function renderResumen(mes) {
+  const data = DEMO[mes];
+  const cats = Object.entries(data.por_categoria).sort((a, b) => b[1] - a[1]);
+
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Total real</div>
+      <div class="kpi-value"><span class="currency">$</span>${fmt(data.total_real)}</div>
+      <div class="kpi-sub">${mes}</div>
+    </div>
+    <div class="kpi" style="--kpi-color:var(--accent2)">
+      <div class="kpi-label">Cuotas comprometidas</div>
+      <div class="kpi-value"><span class="currency">$</span>${fmt(data.total_informativo)}</div>
+      <div class="kpi-sub">${data.cuotas.length} cuota${data.cuotas.length !== 1 ? 's' : ''} activa${data.cuotas.length !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="kpi" style="--kpi-color:var(--accent3)">
+      <div class="kpi-label">Categorías activas</div>
+      <div class="kpi-value">${cats.length}</div>
+      <div class="kpi-sub">${cats[0][0]} es la mayor</div>
+    </div>
+    <div class="kpi" style="--kpi-color:var(--red)">
+      <div class="kpi-label">Prom. diario estimado</div>
+      <div class="kpi-value"><span class="currency">$</span>${fmt(data.total_real / 30)}</div>
+      <div class="kpi-sub">base 30 días</div>
+    </div>
+  `;
+
+  if (chartPie) { chartPie.destroy(); chartPie = null; }
+  chartPie = new Chart(document.getElementById('chart-pie').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: cats.map(c => c[0]),
+      datasets: [{ data: cats.map(c => c[1]), backgroundColor: PALETTE.slice(0, cats.length), borderWidth: 0, hoverOffset: 6 }]
+    },
+    options: {
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...TOOLTIP, callbacks: { label: ctx => ` $${fmt(ctx.raw)}  (${pct(ctx.raw, data.total_real)}%)` } }
+      }
+    }
+  });
+
+  const max = cats[0][1];
+  document.getElementById('cat-list').innerHTML = cats.map((c, i) => `
+    <div class="cat-row">
+      <span class="cat-name">${c[0]}</span>
+      <div class="cat-bar-bg"><div class="cat-bar" style="width:${(c[1]/max*100).toFixed(1)}%;background:${PALETTE[i%PALETTE.length]}"></div></div>
+      <span class="cat-amt">$${fmt(c[1])} <span style="opacity:.5">${pct(c[1],data.total_real)}%</span></span>
+    </div>
+  `).join('');
+}
+
+// ── Detalle ────────────────────────────────────────────────────────────────────
+let detalleItems = [], sortKey = 'monto', sortDir = 'desc';
+
+function renderDetalle(mes) {
+  detalleItems = mes ? DEMO[mes].items.filter(i => i.monto > 0) : detalleItems;
+  const sorted = [...detalleItems].sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+    return (va < vb ? -1 : va > vb ? 1 : 0) * (sortDir === 'asc' ? 1 : -1);
+  });
+
+  const cols = [
+    { key: 'fecha', label: 'Fecha' },
+    { key: 'concepto', label: 'Concepto' },
+    { key: 'categoria', label: 'Categoría' },
+    { key: 'monto', label: 'Monto', cls: 'text-right' }
+  ];
+
+  const thead = cols.map(c => {
+    let cls = c.cls || '';
+    if (sortKey === c.key) cls += ' ' + sortDir;
+    return `<th class="${cls}" data-key="${c.key}">${c.label}</th>`;
+  }).join('');
+
+  document.getElementById('items-wrap').innerHTML = `
+    <table>
+      <thead><tr>${thead}</tr></thead>
+      <tbody>${sorted.map(i => `
+        <tr>
+          <td class="mono" style="color:var(--muted)">${i.fecha}</td>
+          <td>${i.concepto}</td>
+          <td><span class="pill">${i.categoria}</span></td>
+          <td class="mono text-right">$${fmt(i.monto)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+
+  document.querySelectorAll('#items-wrap th').forEach(th => {
+    th.style.cursor = 'pointer';
+    th.addEventListener('click', () => {
+      const key = th.dataset.key;
+      if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      else { sortKey = key; sortDir = key === 'monto' ? 'desc' : 'asc'; }
+      renderDetalle(null);
+    });
+  });
+}
+
+// ── Cuotas ────────────────────────────────────────────────────────────────────
+function renderCuotas(mes) {
+  const data = DEMO[mes];
+  document.getElementById('kpi-cuotas-total').innerHTML = `<span class="currency">$</span>${fmt(data.total_informativo)}`;
+  document.getElementById('kpi-cuotas-count').textContent = `${data.cuotas.length} cuotas activas`;
+  document.getElementById('cuotas-wrap').innerHTML = `
+    <table>
+      <thead><tr><th>Concepto</th><th>Categoría</th><th>Cuota</th><th class="text-right">Monto</th></tr></thead>
+      <tbody>${data.cuotas.map(c => `
+        <tr>
+          <td>${c.concepto}</td>
+          <td><span class="pill">${c.categoria}</span></td>
+          <td><span class="pill pill-cuota">${c.cuota}</span></td>
+          <td class="mono text-right">$${fmt(c.monto)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ── Comparar ───────────────────────────────────────────────────────────────────
+function renderComparacion() {
+  const mes1 = document.getElementById('comp-mes1').value;
+  const mes2 = document.getElementById('comp-mes2').value;
+  const d1 = DEMO[mes1], d2 = DEMO[mes2];
+
+  const cats = [...new Set([...Object.keys(d1.por_categoria), ...Object.keys(d2.por_categoria)])].sort();
+  const diff = d2.total_real - d1.total_real;
+  const diffPct = ((diff / d1.total_real) * 100).toFixed(1);
+  const deltaClass = diff > 0 ? 'up' : 'down';
+  const deltaSign = diff > 0 ? '+' : '';
+
+  const totBox = document.getElementById('comp-totals');
+  totBox.style.display = 'grid';
+  totBox.innerHTML = `
+    <div class="comp-box">
+      <div class="comp-box-label">${mes1}</div>
+      <div class="comp-box-val m1">$${fmt(d1.total_real)}</div>
+    </div>
+    <div class="comp-box">
+      <div class="comp-box-label">${mes2} <span class="delta ${deltaClass}">${deltaSign}${diffPct}%</span></div>
+      <div class="comp-box-val m2">$${fmt(d2.total_real)}</div>
+    </div>`;
+
+  document.getElementById('comp-chart-card').style.display = 'flex';
+
+  if (chartComp) { chartComp.destroy(); chartComp = null; }
+  chartComp = new Chart(document.getElementById('chart-comp').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: cats,
+      datasets: [
+        { label: mes1, data: cats.map(c => d1.por_categoria[c] || 0), backgroundColor: 'rgba(80,110,255,.75)', borderRadius: 5 },
+        { label: mes2, data: cats.map(c => d2.por_categoria[c] || 0), backgroundColor: 'rgba(255,160,80,.75)', borderRadius: 5 }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#a7b0d6', font: { family: 'inherit', size: 12 }, boxWidth: 12 } },
+        tooltip: { ...TOOLTIP, callbacks: { label: ctx => ` $${fmt(ctx.raw)}` } }
+      },
+      scales: {
+        x: { ticks: { color: '#a7b0d6', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,.05)' } },
+        y: { ticks: { color: '#a7b0d6', font: { size: 11 }, callback: v => '$' + fmt(v) }, grid: { color: 'rgba(255,255,255,.05)' } }
+      }
+    }
+  });
+}
+
+// ── Tabs ───────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
