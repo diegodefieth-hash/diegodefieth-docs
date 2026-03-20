@@ -15,7 +15,7 @@ El código no está publicado — estos READMEs están pensados para que cualqui
 | [plantilla-bot](./plantilla-bot/README.md) | Template para documentar bots de home server |
 | [pago-con-cripto](./pago-con-cripto/README.md) | Herramienta estática para cobrar en cripto en un negocio — ARS a USDC/USDT con QR de FluidKey |
 | [trading-bot](./trading-bot/README.md) | Bot de trading automático para Binance Spot — estructura genérica adaptable a cualquier par y estrategia |
-| [bot-gastos](./bot-gastos/README.md) | Bot de Telegram para registrar gastos diarios con categorías, cuotas automáticas y reportes desde Google Sheets |
+| [bot-gastos](./bot-gastos/README.md) | Agente conversacional de gastos personales vía Telegram con IA — lenguaje natural, edición, borrado y memoria de categorías. Datos en Google Sheets |
 | [dashboard-gastos](./dashboard-gastos/README.md) | Panel web para visualizar gastos de bot-gastos — lee directo de Google Sheets, sin base de datos |
 | [fluid-lite-diagram](./fluid-lite-diagram/index.html) | Diagrama interactivo del sistema Fluid Lite USD Vault — flujo completo desde depósito hasta yield, activos, estrategia de leverage y riesgos |
 ---
