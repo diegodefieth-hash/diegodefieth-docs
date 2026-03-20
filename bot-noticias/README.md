@@ -220,3 +220,4 @@ grep -i supabase logs/bot_$(date +%Y%m%d).log
 | 2026-03-11 | v1.2.0 — Secciones separadas (POLÍTICA / ECONOMÍA), titular con 📰, instrucciones anti-dramatismo en cierre del día. |
 | 2026-03-12 | v1.2.1 — Agregadas reglas anti-noticias-viejas: fecha explícita en USER_PROMPT y restricción de 24hs en SYSTEM_PROMPT. |
 | 2026-03-17 | v1.3.1 — Integración Supabase: `guardar_en_supabase()` al final de `main()`, anti-duplicados por fecha, `supabase>=2.0.0` en requirements. |
+| 2026-03-20 | v1.4.0 — fix crítico: REGLA CRÍTICA en system prompt, Claude nunca rechaza la generación. Mínimo noticias bajado de 5 a 2 |
