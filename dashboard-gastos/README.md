@@ -1,6 +1,12 @@
 # dashboard-gastos
 
 Panel web personal para visualizar los gastos registrados por `bot-gastos`. Lee directamente de Google Sheets sin base de datos ni backend propio.
+## 🌐 Ver demo
+
+👉 **[diegodefieth-hash.github.io/diegodefieth-docs/dashboard-gastos](https://diegodefieth-hash.github.io/diegodefieth-docs/dashboard-gastos/)**
+
+> Demo con datos ficticios — el dashboard real conecta a tu Google Sheet.
+
 
 > Diseñado para correr en un servidor local accesible por red privada (Tailscale, VPN, LAN).
 
