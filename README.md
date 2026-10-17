@@ -19,7 +19,6 @@ El código no está publicado — estos READMEs están pensados para que cualqui
 | [dashboard-gastos](./dashboard-gastos/README.md) | Panel web para visualizar gastos de bot-gastos — lee directo de Google Sheets, sin base de datos. 🌐 [Ver sitio demo](https://diegodefieth-hash.github.io/diegodefieth-docs/dashboard-gastos/) |
 | [fluid-lite-diagram](./fluid-lite-diagram/index.html) | Diagrama interactivo del sistema Fluid Lite USD Vault — flujo completo desde depósito hasta yield, activos, estrategia de leverage y riesgos |
 | [bot-noticias](./bot-noticias/README.md) | Agente diario que genera resumen editorial con Claude Haiku + web search y lo publica en Telegram a las 19:00 hs. Canal: [@resumendeldiaarg](https://t.me/resumendeldiaarg) |
-| [web-noticias](./web-noticias/README.md) | Web pública de noticias generadas por IA — resumen diario automatizado de política argentina y economía mundial. Deploy en Vercel. 🌐 [Ver sitio](https://web-noticias-three.vercel.app/) |
 | [smn-alertas](./smn-alertas/README.md) | Monitor de alertas meteorológicas del SMN — envía email automático cuando cambia el estado de alerta para una zona configurada |
 
 ---

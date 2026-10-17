@@ -1,0 +1,25 @@
+
+# --- auditoría 2026-10-17 (estándar Notion) ---
+.env
+.env.*
+*.env
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.bak*
+*.backup.*
+*.tar.gz
+.codex/
+logs/
+*.log
+venv/
+.venv/
+__pycache__/
+node_modules/
+*.db
+*.sqlite*
+state.json
+state_*.json
+.DS_Store
